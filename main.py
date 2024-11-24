@@ -45,6 +45,25 @@ class AlbumResponse(BaseModel):
     likes: int
     deslikes: int
 
+class LoginResponse ( BaseModel):
+    sucess: bool
+    message: str
+
+@app.post("/login/")
+async def login(login_data: User):
+    # Procurando o usuário no banco de dados
+    user = await usuarios_collection.find_one({"usuario": login_data.usuario})
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    # Verificando se a senha fornecida bate com a senha do banco de dados
+    if login_data.senha != user['senha']:
+        raise HTTPException(status_code=401, detail="Senha incorreta")
+
+    # Retornando resposta de sucesso
+    return LoginResponse(success=True, message="Login bem-sucedido")
+
 @app.post("/users/")
 async def create_user(user: User):
     user_dict = user.dict()
