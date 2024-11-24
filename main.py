@@ -49,8 +49,12 @@ class LoginResponse ( BaseModel):
     sucess: bool
     message: str
 
+class LoginRequest(BaseModel):
+    usuario: str
+    senha: str
+
 @app.post("/login/")
-async def login(login_data: User):
+async def login(login_data: LoginRequest):
     # Procurando o usuário no banco de dados
     user = await usuarios_collection.find_one({"usuario": login_data.usuario})
 
@@ -63,6 +67,7 @@ async def login(login_data: User):
 
     # Retornando resposta de sucesso
     return LoginResponse(success=True, message="Login bem-sucedido")
+
 
 @app.post("/users/")
 async def create_user(user: User):
