@@ -45,7 +45,7 @@ class AlbumResponse(BaseModel):
     likes: int
     deslikes: int
 
-class Login ( BaseModel):
+class LoginResponse ( BaseModel):
     sucess: bool
     message: str
 
