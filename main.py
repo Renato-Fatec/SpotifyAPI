@@ -95,6 +95,24 @@ async def read_album(album_id: str):
     album["id"] = str(album["_id"])
     return album
 
+@app.post("/addlike/{user_id}/{album_id}")
+async def add_like(user_id: str, album_id: str):
+    # Verifica se o usuário existe
+    user = await usuarios_collection.find_one({"usuario": user_id})
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Verifica se o álbum já está na lista de likes
+    if album_id in user.get("likes", []):
+        raise HTTPException(status_code=400, detail="Album already liked")
+
+    # Adiciona o album_id à lista de likes do usuário
+    await usuarios_collection.update_one(
+        {"usuario": user_id},
+        {"$addToSet": {"likes": album_id}}  # $addToSet evita duplicação
+    )
+    return {"message": "Like added successfully", "user_id": user_id, "album_id": album_id}
+
 @app.put("/users/{user_id}/likes")
 async def add_likes(user_id: str, like_data: id_Likes):
     # Verifica se o usuário existe
